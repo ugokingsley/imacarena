@@ -20,6 +20,8 @@ from django.contrib import admin
 from bookmarks.views import *
 
 urlpatterns = [
+    url(r'^user/', include('bookmarks.urls')),
     url(r'^admin/', admin.site.urls),
     url (r'^$', main_page),
+
 ]
