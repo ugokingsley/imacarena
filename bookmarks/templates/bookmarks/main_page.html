@@ -1,13 +1,12 @@
-<html>
-<head>
-    <title>Django Bookmarks</title>
-</head>
-<body>
-<h1>Welcome to Django Bookmarks</h1>
+{% extends "bookmarks/base.html" %}
+{% block title %}Welcome to Django Bookmarks{% endblock %}
+{% block head %}Welcome to Django Bookmarks{% endblock %}
+{% block content %}
+
 {% if user.is_authenticated %}
 <p>Welcome {{ user.username }}!        Here you can store and share bookmarks!</p>
 {% else %}
 <p>Welcome anonymous user!      You need to <a href="bookmarks/login/">login</a>      before you can store and share bookmarks.</p>
 {% endif %}
-</body>
-</html>
+
+{% endblock %}

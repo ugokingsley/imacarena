@@ -1,9 +1,8 @@
-<html>
-<head>
-    <title>Django Bookmarks - User Login</title>
-</head>
-<body>
-<h1>User Login</h1>
+{% extends "bookmarks/base.html" %}
+{% block title %}User Login{% endblock %}
+{% block head %}User Login{% endblock %}
+{% block content %}
+
 {% if form.errors %}
     <p>Your username and password didn't match.Please try again.</p>
 {% endif %}
@@ -16,5 +15,4 @@
     <input type="hidden" name="next" value="/" />
     <input type="submit" value="login" />
 </form>
-</body>
-</html>
+{% endblock %}
