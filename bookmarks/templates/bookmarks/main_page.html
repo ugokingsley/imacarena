@@ -1,11 +1,13 @@
-<!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>{{head_title}}</title>
+    <title>Django Bookmarks</title>
 </head>
 <body>
-<h1>{{page_title}}</h1>
-<p>{{page_body}}</p>
+<h1>Welcome to Django Bookmarks</h1>
+{% if user.is_authenticated %}
+<p>Welcome {{ user.username }}!        Here you can store and share bookmarks!</p>
+{% else %}
+<p>Welcome anonymous user!      You need to <a href="bookmarks/login/">login</a>      before you can store and share bookmarks.</p>
+{% endif %}
 </body>
 </html>

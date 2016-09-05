@@ -16,13 +16,14 @@ Including another URLconf
 from django.conf.urls import *
 from django.conf.urls import url
 from django.contrib import admin
-
+from django.contrib.auth import views as auth_views
 from bookmarks.views import *
 
 urlpatterns = [
 
-    url(r'^user/', include('bookmarks.urls')),
+    #url(r'^user/', include('bookmarks.urls')),
+    url(r'^bookmarks/', include('bookmarks.urls')),
     url(r'^admin/', admin.site.urls),
     url (r'^$', main_page),
-
+    #url(r'^login/$', auth_views.login, {'template_name': 'registration/login.html'}),
 ]
