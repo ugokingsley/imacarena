@@ -16,9 +16,9 @@
  <div id="nav">
      <a href="/">home</a> |
      {% if user.is_authenticated %}
-        welcome {{ user.username }}      (<a href="bookmarks/logout">logout</a>)
+        welcome {{ user.username }}      (<a href="/bookmarks/logout">logout</a>)
      {% else %}
-        <a href="bookmarks/login/">login</a>
+        <a href="/bookmarks/login/">login</a> | <a href="/bookmarks/register/">register</a>
      {% endif %}
  </div>
  <h1>{% block head %}{% endblock %}</h1>
