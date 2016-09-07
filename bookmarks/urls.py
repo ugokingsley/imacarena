@@ -22,6 +22,7 @@ urlpatterns = [
 
    #account management
    url(r'^save/$', views.bookmark_save_page, name='bookmark_save'),
+   url(r'^tag/([^\s]+)/$', views.tag_page, name='tag_page'),
    #url(r'^site_media/(?P<path>.*)$', 'django.views.static.serve',    { 'document_root': site_media }),
    #url(r'^register/$',views.register_page, name='register_page'),
    #url(r'^register/success/$', direct_to_template,  { 'template_name': 'registration/register_success.html' }),

@@ -4,3 +4,4 @@
  input {  display: block; }
 
  body{margin:67px;}
+ ul.tags, ul.tags li {  display: inline;  margin: 0;  padding: 0; }

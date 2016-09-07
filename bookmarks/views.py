@@ -9,6 +9,8 @@ from django.template import RequestContext
 from bookmarks.forms import *
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from bookmarks.models import *
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import get_object_or_404
 
 
 def main_page(request):
@@ -24,39 +26,30 @@ def main_page(request):
     return HttpResponse(output)
     '''
 def user_page(request, username):
+    '''
     try:
         user = User.objects.get(username=username)
     except:
         raise Http404('Requested user not found.')
     bookmarks = user.bookmark_set.all()
+    '''
+    user = get_object_or_404(User, username=username)
+    bookmarks = user.bookmark_set.order_by('-id')
     variables = RequestContext(request, {
+        'bookmarks': bookmarks,
         'username': username,
-        'bookmarks': bookmarks
+        'show_tags': True
     })
+
+
     return render_to_response('bookmarks/user_page.html', variables)
 
 
 def logout_page(request):
     logout(request)
     return HttpResponseRedirect('/')
-'''
-def register_page(request):
-    if request.method == 'POST':
-        form = RegistrationForm(request.POST)
-        if form.is_valid():
-            user = User.objects.create_user(
-                username=form.clean_data['username'],
-                password=form.clean_data['password1'],
-                email=form.clean_data['email']
-            )
-            return HttpResponseRedirect('/register/success/')
-    else:
-        form = RegistrationForm()
-        variables = RequestContext(request, {
-            'form': form
-        })
-    return render_to_response('registration/register.html',variables)
-'''
+
+
 @csrf_exempt
 def register(request):
     context = RequestContext(request)
@@ -86,6 +79,7 @@ def register(request):
 
 
 @csrf_exempt
+@login_required(login_url='/bookmarks/login/')
 def bookmark_save_page(request):
     if request.method == 'POST':
         form = BookmarkSaveForm(request.POST)
@@ -121,6 +115,16 @@ def bookmark_save_page(request):
     })
     return render_to_response('bookmarks/bookmark_save.html', variables)
 
+def tag_page(request, tag_name):
+    tag = get_object_or_404(Tag, name=tag_name)
+    bookmarks = tag.bookmarks.order_by('-id')
+    variables = RequestContext(request, {
+        'bookmarks': bookmarks,
+        'tag_name': tag_name,
+        'show_tags': True,
+        'show_user': True
+    })
+    return render_to_response('bookmarks/tag_page.html', variables)
 
 
 
