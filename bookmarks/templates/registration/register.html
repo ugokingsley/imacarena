@@ -3,9 +3,9 @@
 {% block head %}User Registration{% endblock %}
 {% block content %}
 {% if registered %}
-    Rango says: <strong>thank you for registering!</strong> <a href="/rango/">Return to the homepage.</a><br />
+    ImacArena says: <strong>thank you for registering!</strong> <a href="/">Return to the homepage.</a><br />
 {% else %}
-    Rango says: <strong>register here!</strong><br />
+    ImacArena says: <strong>register here!</strong><br />
     <form id="user_form" method="post" action="/bookmarks/register/" enctype="multipart/form-data">
     {% csrf_token %}
         {{ user_form.as_p }}
