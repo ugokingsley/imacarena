@@ -14,6 +14,9 @@ app_name='bookmarks'
 urlpatterns = [
    #browsing
    url(r'^user/(\w+)/$',views.user_page, name='user_page'),
+   url(r'^tag/([^\s]+)/$', views.tag_page, name='tag_page'),
+   url(r'^tag/$', views.tag_cloud_page, name='tag_cloud_page'),
+   url(r'^search/$', views.search_page, name='search_page'),
 
    #session management
    url(r'^login/$', auth_views.login, {'template_name': 'registration/login.html'}),
@@ -22,8 +25,7 @@ urlpatterns = [
 
    #account management
    url(r'^save/$', views.bookmark_save_page, name='bookmark_save'),
-   url(r'^tag/([^\s]+)/$', views.tag_page, name='tag_page'),
-   url(r'^tag/$', views.tag_cloud_page, name='tag_cloud_page'),
+
    #url(r'^site_media/(?P<path>.*)$', 'django.views.static.serve',    { 'document_root': site_media }),
    #url(r'^register/$',views.register_page, name='register_page'),
    #url(r'^register/success/$', direct_to_template,  { 'template_name': 'registration/register_success.html' }),

@@ -11,6 +11,8 @@ from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from bookmarks.models import *
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
+from django.core.exceptions import ObjectDoesNotExist
+
 
 
 def main_page(request):
@@ -38,7 +40,8 @@ def user_page(request, username):
     variables = RequestContext(request, {
         'bookmarks': bookmarks,
         'username': username,
-        'show_tags': True
+        'show_tags': True,
+        'show_edit': username == request.user.username,
     })
 
 
@@ -78,8 +81,77 @@ def register(request):
         context)
 
 
+
+
+
 @csrf_exempt
 @login_required(login_url='/bookmarks/login/')
+def bookmark_save_page(request):
+    if request.method == 'POST':
+        form = BookmarkSaveForm(request.POST)
+        if form.is_valid():
+            bookmark = _bookmark_save(request, form)
+            return HttpResponseRedirect(
+                '/bookmarks/user/%s/' % request.user.username
+            )
+    elif request.GET.has_key('url'):
+        url = request.GET['url']
+        title = ''
+        tags = ''
+        try:
+            link = Link.objects.get(url=url)
+            bookmark = Bookmark.objects.get(
+                link=link,
+                user=request.user
+            )
+            title = bookmark.title
+            tags = ' '.join(
+                tag.name for tag in bookmark.tag_set.all()
+            )
+        except ObjectDoesNotExist:
+            pass
+        form = BookmarkSaveForm({
+            'url': url,
+            'title': title,
+            'tags': tags
+        })
+
+    else:
+        form = BookmarkSaveForm()
+    variables = RequestContext(request, {
+        'form': form
+    })
+    return render_to_response('bookmarks/bookmark_save.html', variables)
+
+
+
+def _bookmark_save(request, form):
+# Create or get link.
+    link, dummy =Link.objects.get_or_create(url=form.clean_data['url'])
+    # Create or get bookmark.
+    bookmark, created = Bookmark.objects.get_or_create(
+        user=request.user,
+        link=link
+    )
+    # Update bookmark title.
+    bookmark.title = form.clean_data['title']
+# If the bookmark is being updated, clear old tag list.
+    if not created:
+        bookmark.tag_set.clear()
+    # Create new tag list.
+    tag_names = form.clean_data['tags'].split()
+    for tag_name in tag_names:
+        tag, dummy = Tag.objects.get_or_create(name=tag_name)
+        bookmark.tag_set.add(tag)
+     # Save bookmark to database and return it.
+        bookmark.save()
+        return bookmark
+
+
+
+
+
+'''
 def bookmark_save_page(request):
     if request.method == 'POST':
         form = BookmarkSaveForm(request.POST)
@@ -114,6 +186,11 @@ def bookmark_save_page(request):
         'form': form
     })
     return render_to_response('bookmarks/bookmark_save.html', variables)
+'''
+
+
+
+
 
 def tag_page(request, tag_name):
     tag = get_object_or_404(Tag, name=tag_name)
@@ -151,6 +228,26 @@ def tag_cloud_page(request):
     return render_to_response('bookmarks/tag_cloud_page.html', variables)
 
 
+def search_page(request):
+    form = SearchForm()
+    bookmarks = []
+    show_results = False
+    if request.GET.has_key('query'):
+        show_results = True
+        query = request.GET['query'].strip()
+        if query:
+            form = SearchForm({'query' : query})
+            bookmarks =Bookmark.objects.filter (title__icontains=query)[:10]
+    variables = RequestContext(request, { 'form': form,
+                'bookmarks': bookmarks,
+                'show_results': show_results,
+                'show_tags': True,
+                'show_user': True
+                 })
+    if request.GET.has_key('ajax'):
+        return render_to_response('bookmarks/bookmark_list.html', variables)
+    else:
+        return render_to_response('bookmarks/search.html', variables)
 
 
 
