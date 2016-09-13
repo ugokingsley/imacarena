@@ -20,7 +20,8 @@
      {% if user.is_authenticated %}
          <a href="/bookmarks/save/">submit</a> |
         <a href="/bookmarks/search/">search</a> |
-     <a href="/bookmarks/user/{{ user.username }}/"> {{ user.username }}</a> |  <a href="/bookmarks/logout/">logout</a>
+     <a href="/bookmarks/user/{{ user.username }}/"> {{ user.username }}</a> |
+     <a href="/bookmarks/logout/">logout</a>
      {% else %}
         <a href="/bookmarks/login/">login</a> | <a href="/bookmarks/register/">register</a>
      {% endif %}

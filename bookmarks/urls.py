@@ -5,6 +5,8 @@ import os.path
 #from django.conf.urls. import *
 from bookmarks.views import *
 #from django.views.generic.simple import direct_to_template
+from django_comments.forms import CommentForm
+from django_comments.models import Comment
 
 
 app_name='bookmarks'
@@ -22,6 +24,7 @@ urlpatterns = [
    url(r'^popular/$', views.popular_page, name='popular_page'),
 
    # Comments
+   url(r'^bookmark/(\d+)/$', views.bookmark_page, name='bookmark_page'),
    #url(r'^comments/', include('django.comments.urls')),
    #session management
    #url(r'^login/$', auth_views.login, {'template_name': 'registration/login.html'}),
@@ -33,6 +36,9 @@ urlpatterns = [
    url(r'^save/$', views.bookmark_save_page, name='bookmark_save'),
    url(r'^vote/$', views.bookmark_vote_page, name='bookmark_vote_page'),
 
+   # Friends
+   url(r'^friends/(\w+)/$', views.friends_page, name='friends_page'),
+   url(r'^friend/add/$', views.friend_add, name='friend_page'),
    #url(r'^site_media/(?P<path>.*)$', 'django.views.static.serve',    { 'document_root': site_media }),
    #url(r'^register/$',views.register_page, name='register_page'),
    #url(r'^register/success/$', direct_to_template,  { 'template_name': 'registration/register_success.html' }),

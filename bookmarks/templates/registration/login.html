@@ -17,6 +17,9 @@
 </form>
 -->
 <h1>Login to ImacArena</h1>
+{% if form.errors %}
+    <p>Your username and password didn't match.Please try again.</p>
+{% endif %}
 <form id="login_form" method="post" action="/bookmarks/login/">
     {% csrf_token %}
     Username: <input type="text" name="username" value="" size="50" /> <br />

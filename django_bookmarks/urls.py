@@ -18,6 +18,9 @@ from django.conf.urls import url
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from bookmarks.views import *
+from django_comments import urls
+
+
 
 urlpatterns = [
 
@@ -26,4 +29,5 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url (r'^$', main_page),
     #url(r'^login/$', auth_views.login, {'template_name': 'registration/login.html'}),
+    url(r'^comments/', include('django_comments.urls')),
 ]
