@@ -17,14 +17,21 @@ urlpatterns = [
    url(r'^tag/([^\s]+)/$', views.tag_page, name='tag_page'),
    url(r'^tag/$', views.tag_cloud_page, name='tag_cloud_page'),
    url(r'^search/$', views.search_page, name='search_page'),
+   # Ajax
+   url(r'^ajax/tag/autocomplete/$', views.ajax_tag_autocomplete, name='ajax_tag_autocomplete'),
+   url(r'^popular/$', views.popular_page, name='popular_page'),
 
+   # Comments
+   #url(r'^comments/', include('django.comments.urls')),
    #session management
-   url(r'^login/$', auth_views.login, {'template_name': 'registration/login.html'}),
+   #url(r'^login/$', auth_views.login, {'template_name': 'registration/login.html'}),
    url(r'^logout/$',views.logout_page, name='logout'),
    url(r'^register/$', views.register, name='register'),
+   url(r'^login/$', views.user_login, name='login'),
 
    #account management
    url(r'^save/$', views.bookmark_save_page, name='bookmark_save'),
+   url(r'^vote/$', views.bookmark_vote_page, name='bookmark_vote_page'),
 
    #url(r'^site_media/(?P<path>.*)$', 'django.views.static.serve',    { 'document_root': site_media }),
    #url(r'^register/$',views.register_page, name='register_page'),

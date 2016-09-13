@@ -28,3 +28,12 @@ class UserProfile(models.Model):
     def __unicode__(self):
         return self.user.username
 
+
+class SharedBookmark(models.Model):
+    bookmark = models.ForeignKey(Bookmark, unique=True)
+    date = models.DateTimeField(auto_now_add=True)
+    votes = models.IntegerField(default=1)
+    users_voted = models.ManyToManyField(User)
+    def __str__(self):
+        return '%s, %s' % (self.bookmark, self.votes)
+

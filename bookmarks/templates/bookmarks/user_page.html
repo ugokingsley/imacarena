@@ -1,4 +1,10 @@
 {% extends "bookmarks/base.html" %}
+{% block external %}
+{% load staticfiles %}
+
+<script src="{% static 'bookmarks/js/bookmark_edit.js' %}"></script>
+
+{% endblock %}
 {% block title %}{{ username }}{% endblock %}
 {% block head %}Bookmarks for {{ username }}{% endblock %}
 {% block content %}
