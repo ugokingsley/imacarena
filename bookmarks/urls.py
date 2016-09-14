@@ -7,6 +7,13 @@ from bookmarks.views import *
 #from django.views.generic.simple import direct_to_template
 from django_comments.forms import CommentForm
 from django_comments.models import Comment
+from bookmarks.feeds import *
+
+
+
+feeds = {'recent': RecentBookmarks,
+         'user': UserBookmarks
+         }
 
 
 app_name='bookmarks'
@@ -39,8 +46,18 @@ urlpatterns = [
    # Friends
    url(r'^friends/(\w+)/$', views.friends_page, name='friends_page'),
    url(r'^friend/add/$', views.friend_add, name='friend_page'),
+   url(r'^friend/invite/$', views.friend_invite, name='friend_invite'),
+   url (r'^friend/accept/(\w+)/$', views.friend_accept, name="friend_accept"),
    #url(r'^site_media/(?P<path>.*)$', 'django.views.static.serve',    { 'document_root': site_media }),
    #url(r'^register/$',views.register_page, name='register_page'),
    #url(r'^register/success/$', direct_to_template,  { 'template_name': 'registration/register_success.html' }),
    #url(r'^register/success/$', direct_to_template,  { 'template': 'registration/register_success.html' }),
+
+
+   # Feeds
+   url(r'^feeds/$', RecentBookmarks(), {'feed_dict': feeds}),
+   #url(r'^feeds/user/$', UserBookmarks()),
+   #url(r'^feeds/(?P<url>.*)/$', 'django.contrib.syndication.views.feed',{'feed_dict': feeds}),
+
+
 ]

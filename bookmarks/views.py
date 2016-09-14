@@ -13,6 +13,15 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
 from django.core.exceptions import ObjectDoesNotExist
 from datetime import datetime, timedelta
+from django.db.models import Q
+from django.core.paginator import Paginator
+
+
+
+
+
+
+
 
 
 def main_page(request):
@@ -21,33 +30,67 @@ def main_page(request):
         'shared_bookmarks': shared_bookmarks
     })
     return render_to_response('bookmarks/main_page.html', variables)
-    '''
-    template = get_template('bookmarks/main_page.html')
-    variables = Context({
-        'user': request.user
-    })
-    output = template.render(variables)
-    return HttpResponse(output)
-    '''
+
+
+
+
+
+
+
+
+ITEMS_PER_PAGE = 10
+'''
 def user_page(request, username):
-    '''
-    try:
-        user = User.objects.get(username=username)
-    except:
-        raise Http404('Requested user not found.')
-    bookmarks = user.bookmark_set.all()
-    '''
     user = get_object_or_404(User, username=username)
-    bookmarks = user.bookmark_set.order_by('-id')
+    query_set = user.bookmark_set.order_by('-id')
+
+    paginator = Paginator(query_set, ITEMS_PER_PAGE)
+    try:
+        page = int(request.GET['page'])
+    except:
+        page = 1
+    try:
+        bookmarks = paginator.get_page(page - 1)
+    except:
+        raise Http404
+
     variables = RequestContext(request, {
         'bookmarks': bookmarks,
         'username': username,
         'show_tags': True,
         'show_edit': username == request.user.username,
+        'show_paginator': paginator.pages > 1,
+        'has_prev': paginator.has_previous_page(page - 1),
+        'has_next': paginator.has_next_page(page - 1),
+        'page': page,
+        'pages': paginator.pages,
+        'next_page': page + 1,
+        'prev_page': page - 1,
+        'is_friend': is_friend
+
     })
-
-
     return render_to_response('bookmarks/user_page.html', variables)
+'''
+
+
+def user_page(request, username):
+    user = get_object_or_404(User, username=username)
+    bookmarks = user.bookmark_set.order_by('-id')
+    is_friend = Friendship.objects.filter(from_friend=request.user,to_friend=user )
+
+    variables = RequestContext(request, {
+        'bookmarks': bookmarks,
+        'username': username,
+        'show_tags': True,
+        'show_edit': username == request.user.username,
+        'is_friend': is_friend,
+        })
+    return render_to_response('bookmarks/user_page.html', variables)
+
+
+
+
+
 
 
 @csrf_exempt
@@ -292,8 +335,16 @@ def search_page(request):
         show_results = True
         query = request.GET['query'].strip()
         if query:
+            '''
             form = SearchForm({'query' : query})
             bookmarks =Bookmark.objects.filter (title__icontains=query)[:10]
+            '''
+            keywords = query.split()
+            q = Q()
+            for keyword in keywords:
+                q = q & Q(title__icontains=keyword)
+                form = SearchForm({'query' : query})
+                bookmarks = Bookmark.objects.filter(q)[:10]
     variables = RequestContext(request, { 'form': form,
                 'bookmarks': bookmarks,
                 'show_results': show_results,
@@ -311,6 +362,12 @@ def ajax_tag_autocomplete(request):
         tags =Tag.objects.filter(name__istartswith=request.GET['q'])[:10]
         return HttpResponse('\n'.join(tag.name for tag in tags))
     return HttpResponse()
+
+
+
+
+
+
 
 
 @login_required(login_url='/bookmarks/login/')
@@ -377,35 +434,29 @@ def friend_add(request):
     else:
         raise Http404
 
-
-def user_page(request, username):
-    user = get_object_or_404(User, username=username)
-    query_set = user.bookmark_set.order_by('-id')
-    paginator = ObjectPaginator(query_set, ITEM_PER_PAGE)
-    is_friend = Friendship.objects.filter(from_friend=request.user,to_friend=user )
-    try:
-        page = int(request.GET['page'])
-    except:
-        page = 1
-    try:
-        bookmarks = paginator.get_page(page - 1)
-    except:
-        raise Http404
+@csrf_exempt
+@login_required
+def friend_invite(request):
+    if request.method == 'POST':
+        form = FriendInviteForm(request.POST)
+        if form.is_valid():
+            invitation = Invitation(name = form.cleaned_data['name'],
+                                    email = form.cleaned_data['email'],
+                                    code = User.objects.make_random_password(20),
+                                    sender = request.user
+                                    )
+            invitation.save()
+            invitation.send()
+            return HttpResponseRedirect('/bookmarks/friend/invite/')
+    else:
+        form = FriendInviteForm()
     variables = RequestContext(request, {
-        'bookmarks': bookmarks,
-        'username': username,
-        'show_tags': True,
-        'show_edit': username == request.user.username,
-        'show_paginator': paginator.pages > 1,
-        'has_prev': paginator.has_previous_page(page - 1),
-        'has_next': paginator.has_next_page(page - 1),
-        'page': page,
-        'pages': paginator.pages,
-        'next_page': page + 1,
-        'prev_page': page - 1,
-        'is_friend': is_friend
+                'form': form
     })
-    return render_to_response('user_page.html', variables)
+    return render_to_response('bookmarks/friend_invite.html', variables)
 
 
-
+def friend_accept(request, code):
+    invitation = get_object_or_404(Invitation, code__exact=code)
+    request.session['invitation'] = invitation.id
+    return HttpResponseRedirect('/bookmarks/register/')

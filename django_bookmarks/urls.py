@@ -22,6 +22,7 @@ from django_comments import urls
 
 
 
+
 urlpatterns = [
 
     #url(r'^user/', include('bookmarks.urls')),

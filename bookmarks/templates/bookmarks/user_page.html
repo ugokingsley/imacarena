@@ -1,5 +1,8 @@
 {% extends "bookmarks/base.html" %}
 {% block external %}
+ <link rel="alternate" type="application/rss+xml" title="Django Bookmarks | Bookmarks for {{ username }}"    href="/bookmarks/feeds/user/{{ username }}" />
+
+
 {% load staticfiles %}
 
 <script src="{% static 'bookmarks/js/bookmark_edit.js' %}"></script>
@@ -10,13 +13,13 @@
 {% block content %}
 
 {% ifequal user.username username %}
-<a href="/friends/{{ username }}/">view your friends</a>
+<a href="/bookmarks/friends/{{ username }}/">view your friends</a>
 {% else %}
 {% if is_friend %}
-<a href="/friends/{{ user.username }}/">{{ username }} is a friend of yours</a>
+<a href="/bookmarks/friends/{{ user.username }}/">{{ username }} is a friend of yours</a>
 {% else %}
-<a href="/friend/add/?username={{ username }}">add {{ username }} to your friends</a>
-{% endif %}  - <a href="/friends/{{ username }}/">view {{username }}'s friends</a>
+<a href="/bookmarks/friend/add/?username={{ username }}">add {{ username }} to your friends</a>
+{% endif %}  - <a href="/bookmarks/friends/{{ username }}/">view {{username }}'s friends</a>
 {% endifequal %}
 
 {% include "bookmarks/bookmark_list.html" %}
